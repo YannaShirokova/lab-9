@@ -12,9 +12,7 @@ embed-resources: true
 #| warning: false
 
 library(tidyverse)
-library(purrr)
 library(kableExtra)
-
 
 ```
 
@@ -38,6 +36,9 @@ for it to be compatible with `map_int()`!
 
 ```{r}
 #| label: function-simulation-for-random-babies
+#| message: false
+#| warning: false
+#| echo: true
 
 randomBabies <- function(nBabies = 4){
   assigned <- sample(1:nBabies, size = nBabies, replace = FALSE)
@@ -45,9 +46,7 @@ randomBabies <- function(nBabies = 4){
 }
 
 results <- map_int(.x = 1:10000,
-                   .f = ~ randomBabies()
-                   )
-
+                   .f = ~ randomBabies())
 
 table(results) / 10000
 ```
@@ -63,16 +62,22 @@ You may find the following code helpful:
 
 ```{r}
 #| eval: true
+#| message: false
+#| warning: false
+#| echo: true
 
 results_enframe <- enframe(results, 
         name = "simulation_number", 
         value = "ncorrect")
-results_enframe
+
 ```
 :::
 
 ```{r}
 #| label: table-for-random-babies
+#| message: false
+#| warning: false
+#| echo: true
 
 # https://chatgpt.com/share/673fb074-7db4-8006-b51a-d0f1e1b1a58e
 # To include results that are 0
@@ -82,10 +87,9 @@ results_enframe |>
   mutate(proportion = n / sum(n)) |>
   complete(ncorrect = 0:4, fill = list(n = 0, proportion = 0)) |>
   select(ncorrect, proportion) |>
-  pivot_wider(names_from = ncorrect, values_from = proportion, names_prefix = "Corrcet ") |>
-  kable() |>
+  pivot_wider(names_from = ncorrect, values_from = proportion, names_prefix = "Babies: ") |>
+  kable(caption = "Proportion of Simulations by Number of Correctly Returned Babies to their Parents") |>
   kable_styling(bootstrap_options = "striped") 
-
 
 
 ```
@@ -97,6 +101,9 @@ You may find the following code helpful:
 
 ```{r}
 #| eval: false
+#| message: false
+#| warning: false
+#| echo: false
 
 geom_bar(mapping = aes(y = after_stat(count) / sum(after_stat(count))
                        )
@@ -107,20 +114,20 @@ geom_bar(mapping = aes(y = after_stat(count) / sum(after_stat(count))
 
 ```{r}
 #| label: visualization-for-random-babies
+#| message: false
+#| warning: false
+#| echo: true
 
 results_enframe |>
   ggplot(aes(x = as.factor(ncorrect), fill = as.factor(ncorrect))) +
   geom_bar(mapping = aes(y = after_stat(count) / sum(after_stat(count)))) +  
   labs(x = "", 
        y = "",
-       fill = "Correct Babies", 
-       subtitle = "Proportion of 10,000 Simulations where Babies are Correctly Returned",
-       title = "Four Babies Born: Are They Returned to Correct Parents?") +
+       fill = "Correctly Matched Babies", 
+       subtitle = "Proportion of Simulations",
+       title = "Four Babies Born: How Many are Returned to the Correct Parents?") +
   theme_minimal() +
   scale_fill_manual(values = c("skyblue", "lightgreen", "lightcoral", "plum", "lightgoldenrodyellow")) + scale_x_discrete(limits = c("0", "1", "2", "3", "4")) 
-
-
-
 
 ```
 
