@@ -64,15 +64,27 @@ You may find the following code helpful:
 ```{r}
 #| eval: false
 
-enframe(results, 
+results_enframe <- enframe(results, 
         name = "simulation_number", 
         value = "ncorrect")
+results_enframe
 ```
 :::
 
 ```{r}
 #| label: table-for-random-babies
 
+# https://chatgpt.com/share/673fb074-7db4-8006-b51a-d0f1e1b1a58e
+# To include results that are 0
+
+results_enframe |>
+  count(ncorrect) |>
+  mutate(proportion = n / sum(n)) |>
+  complete(ncorrect = 0:4, fill = list(n = 0, proportion = 0)) |>
+  select(ncorrect, proportion) |>
+  pivot_wider(names_from = ncorrect, values_from = proportion, names_prefix = "Corrcet ") |>
+  kable() |>
+  kable_styling(bootstrap_options = "striped") 
 
 ```
 
