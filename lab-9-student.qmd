@@ -1,6 +1,6 @@
 ---
 title: "Lab 9: Data Simulation Exploration"
-author: "Your name here!"
+author: "Yanna Shirokova"
 format: html
 editor: source
 embed-resources: true
@@ -8,6 +8,12 @@ embed-resources: true
 
 ```{r}
 #| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(purrr)
+library(kableExtra)
 
 
 ```
@@ -33,13 +39,17 @@ for it to be compatible with `map_int()`!
 ```{r}
 #| label: function-simulation-for-random-babies
 
-randomBabies <- function(nBabies){
-  ...
+randomBabies <- function(nBabies = 4){
+  assigned <- sample(1:nBabies, size = nBabies, replace = FALSE)
+  sum(assigned == 1:nBabies)
 }
 
 results <- map_int(.x = 1:10000,
-                   .f = ___
+                   .f = ~ randomBabies()
                    )
+
+
+table(results) / 10000
 ```
 
 **2. Create a table displaying the proportion of simulations where 0, 1, 2, 3, and 4 babies were given to their correct parent(s).** Hint: A `pivot_wider()` will be helpful here!
