@@ -13,6 +13,7 @@ embed-resources: true
 
 library(tidyverse)
 library(kableExtra)
+library(gt)
 
 ```
 
@@ -41,6 +42,8 @@ for it to be compatible with `map_int()`!
 #| echo: true
 
 randomBabies <- function(nBabies = 4){
+  stopifnot(is.numeric(nBabies), nBabies > 0, nBabies == floor(nBabies))
+  
   assigned <- sample(1:nBabies, size = nBabies, replace = FALSE)
   sum(assigned == 1:nBabies)
 }
@@ -82,16 +85,25 @@ results_enframe <- enframe(results,
 # https://chatgpt.com/share/673fb074-7db4-8006-b51a-d0f1e1b1a58e
 # To include results that are 0
 
+# Challenge 9!
+
 results_enframe |>
   count(ncorrect) |>
   mutate(proportion = n / sum(n)) |>
   complete(ncorrect = 0:4, fill = list(n = 0, proportion = 0)) |>
   select(ncorrect, proportion) |>
   pivot_wider(names_from = ncorrect, values_from = proportion, names_prefix = "Babies: ") |>
-  kable(caption = "Proportion of Simulations by Number of Correctly Returned Babies to their Parents") |>
-  kable_styling(bootstrap_options = "striped") 
-
-
+  gt() |>
+  tab_header(title = "Proportion of Simulations by Number of Correctly Returned Babies to their Parents") |>
+  fmt_percent(
+    columns = starts_with("Babies: "),  
+    decimals = 1) |> 
+  tab_style(
+    style = list(
+      cell_borders(sides = "all", color = "black", weight = px(2)),
+      cell_fill(color = "skyblue")),
+    locations = cells_body(columns = everything())) 
+  
 ```
 
 **3. Now create a barplot showing the proportion of simulations where 0, 1, 2, 3, and 4 babies were given to their correct parent(s).** 
